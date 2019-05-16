@@ -14,7 +14,7 @@ impl<'s> System<'s> for NodeSystem {
 
   fn run(&mut self, (mut transforms, nodes, input): Self::SystemData) {
     for (_node, mut transform) in (&nodes, &mut transforms).join() {
-      transform.prepend_translation_y(1.0);
+      transform.prepend_translation_y(-1.0);
     }
   }
 }

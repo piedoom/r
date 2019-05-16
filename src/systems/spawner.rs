@@ -6,21 +6,25 @@ use amethyst::ecs::{prelude::*, Join, Read, ReadStorage, Resources, System, Writ
 use amethyst::prelude::*;
 use amethyst::renderer::{SpriteRender, SpriteSheet, SpriteSheetHandle};
 use crate::node::Node;
+use amethyst::core::Time;
 
 pub struct SpawnerSystem {
     origin: (f64, f64),
+    interval: f32,
 }
 
 impl Default for SpawnerSystem {
     fn default() -> Self {
         Self {
             origin: (50.0, 80.0),
+            interval: 0.0,
         }
     }
 }
 
 impl<'s> System<'s> for SpawnerSystem {
     type SystemData = (
+        Read<'s, Time>,
         ReadExpect<'s, Sprites>,
         Entities<'s>,
         WriteStorage<'s, Transform>,
@@ -30,21 +34,35 @@ impl<'s> System<'s> for SpawnerSystem {
 
     fn run(
         &mut self,
-        (sprites, entities, mut transform_storage, mut sprite_render_storage, mut node_storage): Self::SystemData,
+        (
+            time,
+            sprites,
+            entities,
+            mut transform_storage,
+            mut sprite_render_storage,
+            mut node_storage,
+        ): Self::SystemData,
     ) {
         let sprite_render = SpriteRender {
             sprite_sheet: sprites.arrows.clone(),
             sprite_number: 0,
         };
-
-        entities
-            .build_entity()
-            .with(sprite_render, &mut sprite_render_storage)
-            .with(
-                Transform::from(Vector3::new(self.origin.0, self.origin.1, 0.0)),
-                &mut transform_storage,
-            )
-            .with(Node, &mut node_storage)
-            .build();
+        // build every so often
+        let delta_seconds = time.delta_seconds();
+        self.interval -= delta_seconds;
+        println!("{}", self.interval);
+        if self.interval <= 0.0 {
+            entities
+                .build_entity()
+                .with(sprite_render, &mut sprite_render_storage)
+                .with(
+                    Transform::from(Vector3::new(self.origin.0, self.origin.1, 0.0)),
+                    &mut transform_storage,
+                )
+                .with(Node, &mut node_storage)
+                .build();
+            self.interval = 1.0;
+        }
+        
     }
 }
