@@ -50,7 +50,6 @@ impl<'s> System<'s> for SpawnerSystem {
         // build every so often
         let delta_seconds = time.delta_seconds();
         self.interval -= delta_seconds;
-        println!("{}", self.interval);
         if self.interval <= 0.0 {
             entities
                 .build_entity()

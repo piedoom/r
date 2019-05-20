@@ -3,9 +3,9 @@ use amethyst::core::Transform;
 use amethyst::ecs::{Join, Read, ReadStorage, System, WriteStorage};
 use amethyst::input::InputHandler;
 
-pub struct NodeSystem;
+pub struct NodesSystem;
 
-impl<'s> System<'s> for NodeSystem {
+impl<'s> System<'s> for NodesSystem {
   type SystemData = (
     WriteStorage<'s, Transform>,
     ReadStorage<'s, Node>,

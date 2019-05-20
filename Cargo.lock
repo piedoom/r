@@ -2508,6 +2508,7 @@ name = "r"
 version = "0.1.0"
 dependencies = [
  "amethyst 0.10.0 (git+https://github.com/amethyst/amethyst)",
+ "serde 1.0.91 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]

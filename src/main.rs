@@ -4,6 +4,7 @@ use amethyst::utils::application_root_dir;
 
 use amethyst::input::InputBundle;
 use amethyst::prelude::*;
+use crate::systems::catcher::ActionKey;
 
 mod game;
 mod node;
@@ -19,7 +20,7 @@ fn main() -> amethyst::Result<()> {
     let config = DisplayConfig::load(&path);
     let binding_path = assets_dir.join("bindings_config.ron");
     let input_bundle =
-        InputBundle::<String, String>::new().with_bindings_from_file(binding_path)?;
+        InputBundle::<String, ActionKey>::new().with_bindings_from_file(binding_path)?;
 
     let pipe = Pipeline::build().with_stage(
         Stage::with_backbuffer()
@@ -31,7 +32,8 @@ fn main() -> amethyst::Result<()> {
         .with_bundle(TransformBundle::new())?
         .with_bundle(input_bundle)?
         .with(systems::SpawnerSystem::default(), "spawner_system", &[])
-        .with(systems::NodeSystem, "node_system", &["input_system"]);
+        .with(systems::NodesSystem, "nodes_system", &[])
+        .with(systems::CatcherSystem::default(), "catcher_system", &["input_system"]);
 
 
     let mut game = Application::new(assets_dir, game::Game, game_data)?;
