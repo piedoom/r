@@ -6,16 +6,20 @@ use amethyst::renderer::{
     Camera, Flipped, PngFormat, Projection, SpriteRender, SpriteSheet, SpriteSheetFormat,
     SpriteSheetHandle, Texture, TextureMetadata,
 };
+use amethyst::core::math::Vector3;
 use amethyst::core::Transform;
+use crate::systems::Catcher;
 
 pub struct Sprites {
-    pub arrows: SpriteSheetHandle
+    pub arrows: SpriteSheetHandle,
+    pub arrows_line: SpriteSheetHandle,
 }
 
 impl Sprites {
     pub fn new(world: &mut World) -> Self {
         Self {
-            arrows: Game::load_sprite_sheet(world, "textures/arrows.png")
+            arrows: Game::load_sprite_sheet(world, "textures/arrows.png"),
+            arrows_line: Game::load_sprite_sheet(world, "textures/arrows_line.png")
         }
     }
 }
@@ -24,11 +28,19 @@ pub struct Game;
 
 impl SimpleState for Game {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+
+        // create an alias for the world var since it is so commonly used
         let world = data.world;
+
+        // Load sprites and add as a resource
         let sprites = Sprites::new(world);
         world.add_resource(sprites);
 
+        // Setup our camera
         Self::initialize_camera(world);
+
+        // setup other game stuff
+        Self::initialize_game(world);
     }
 }
 
@@ -60,15 +72,37 @@ impl Game {
         )
     }
 
+    fn initialize_game(world: &mut World) {
+        // setup catcher arrows
+
+        // get sprite sheet 
+        // TODO: use resource
+        let sprites = Self::load_sprite_sheet(world, "textures/arrows_line.png");
+
+        // loop to create all arrows
+        for i in 0..4 {
+            let sprite_render = SpriteRender {
+                sprite_sheet: sprites.clone(),
+                // This is somewhat breakable. Should probably use an enum conversion in the future.
+                sprite_number: i,
+            };
+            world.create_entity()
+                .with(
+                    Transform::from(Vector3::new(16.0f64 + (i as f64 * 16.0),50.0,0.0))
+                )
+                .with(Catcher{direction: NodeDirection::from(i)})
+                .with(sprite_render)
+                .build();
+        }
+    }
+
     pub fn initialize_camera(world: &mut World) {
-        let mut transform = Transform::default();
-        transform.set_translation_z(1.0);
         world
             .create_entity()
             .with(Camera::from(Projection::orthographic(
                 0.0, 100.0, 0.0, 100.0,
             )))
-            .with(transform)
+            .with(Transform::from(Vector3::new(0.0,0.0,1.0)))
             .build();
     }
 }

@@ -8,6 +8,10 @@ use amethyst::renderer::{SpriteRender, SpriteSheet, SpriteSheetHandle};
 use crate::node::Node;
 use amethyst::core::Time;
 
+/// Holds information pertaining to the setup of the spawner.
+/// 
+/// * `origin` - position of where nodes start
+/// * `interval` - temporary way to create nodes based on a time interval
 pub struct SpawnerSystem {
     origin: (f64, f64),
     interval: f32,
@@ -22,6 +26,8 @@ impl Default for SpawnerSystem {
     }
 }
 
+/// The SpawnerSystem creates new "nodes" (the arrows that need to be pressed)
+/// along with a song or soundtrack
 impl<'s> System<'s> for SpawnerSystem {
     type SystemData = (
         Read<'s, Time>,

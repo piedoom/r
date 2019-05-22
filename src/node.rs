@@ -7,20 +7,37 @@ use amethyst::{
 };
 
 pub enum NodeDirection {
+    Left,
     Up,
     Down,
-    Left,
     Right,
 }
 
+impl Default for NodeDirection {
+    fn default() -> Self {
+        NodeDirection::Left
+    }
+}
 
 impl NodeDirection {
-    fn to_usize(&self) -> usize {
+    pub fn to_usize(&self) -> usize {
         match self {
-            NodeDirection::Up => 0,
-            NodeDirection::Down => 1,
-            NodeDirection::Left => 2,
+            NodeDirection::Left => 0,
+            NodeDirection::Up => 1,
+            NodeDirection::Down => 2,
             NodeDirection::Right => 3,
+        }
+    }
+}
+
+impl From<usize> for NodeDirection {
+    fn from(n: usize) -> Self {
+        match n {
+            0 => NodeDirection::Left,
+            1 => NodeDirection::Up,
+            2 => NodeDirection::Down,
+            3 => NodeDirection::Right,
+            _ => unreachable!()
         }
     }
 }
