@@ -12,44 +12,14 @@ use amethyst::input::InputBundle;
 use amethyst::core::EventReader;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result};
-use crate::node::NodeDirection;
+use crate::util::actions::*;
+use crate::components::Catcher;
+use amethyst::assets::PrefabData;
 
 /// How much before values are not ignored
 static DEADZONE: f64 = 0.2f64;
 
-#[derive(Hash, PartialEq, Eq, Clone, Serialize, Deserialize, Debug)]
-pub enum ActionKey {
-    NotSupported,
-    Up,
-    Down,
-    Left,
-    Right,
-}
-
-impl From<&NodeDirection> for ActionKey {
-    fn from(direction: &NodeDirection) -> Self {
-        match direction {
-            NodeDirection::Left => ActionKey::Left,
-            NodeDirection::Up => ActionKey::Up,
-            NodeDirection::Down => ActionKey::Down,
-            NodeDirection::Right => ActionKey::Right,
-        }
-    }
-}
-
-impl Display for ActionKey {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "{:?}", self)
-    }
-}
-
 type KeyEvent = InputEvent<ActionKey>;
-
-#[derive(Debug)]
-struct ActionKeyTiming {
-    on: Duration,
-    off: Option<Duration>,
-}
 
 pub struct CatcherSystem {
     /// Key data contains a hash for each wanted "key" (this is helpful if we want to)
@@ -111,55 +81,10 @@ impl<'s> System<'s> for CatcherSystem {
         // see if we have a record in our HashMap for this catcher's direction
         let data = self.key_data.get(&ActionKey::from(&catcher.direction));
         if let Some(d) = data {
-            // set the render index of the catcher depending on our timing data
-            if time.absolute_time() > d.on {
-                // set to active sprite
-                
-            }
-            if d.off.is_some() {
-                if time.absolute_time() > d.off.unwrap() {
-                    // set to inactive sprite
-
-                }
-            }
-            if d.off.is_none() {
-                // set to inactive sprite
-
-            }
         }
     }
   }
 }
 
-// Catcher component
-#[derive(Default)]
-pub struct Catcher {
-    pub direction: NodeDirection,
-}
 
-impl Catcher {
-    pub fn new(direction: NodeDirection) -> Self {
-        Self {
-            direction,
-        }
-    }
 
-    /// Get the sprite index depending on the direction and active state
-    /// 
-    /// * `active` - whether or not the key that should activate this sprite is pressed
-    pub fn sprite_index(&self, active: bool) -> usize {
-        let index = self.direction.to_usize();
-        // if not active, we don't need to do any multiplcation stuff.
-        if !active { 
-            index 
-        } else {
-            // operate as a 1 index so we can calculate the new sprite easier (since 0 * 2 == 0)
-            let index_1 = index + 1;
-            (index_1 * 2) - 1
-        }
-    }
-}
-
-impl Component for Catcher {
-    type Storage = DenseVecStorage<Self>;
-}

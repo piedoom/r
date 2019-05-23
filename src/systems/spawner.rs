@@ -1,12 +1,11 @@
 //! creates nodes according to a song
 use crate::game::Sprites;
-use amethyst::core::math::Vector3;
-use amethyst::core::Transform;
-use amethyst::ecs::{prelude::*, Join, Read, ReadStorage, Resources, System, WriteStorage};
-use amethyst::prelude::*;
-use amethyst::renderer::{SpriteRender, SpriteSheet, SpriteSheetHandle};
-use crate::node::Node;
-use amethyst::core::Time;
+use amethyst::{
+    core::{ Transform, math::Vector3, Time },
+    ecs::{prelude::*, Read, System, WriteStorage},
+    renderer::SpriteRender,
+};
+use crate::components::Node;
 
 /// Holds information pertaining to the setup of the spawner.
 /// 

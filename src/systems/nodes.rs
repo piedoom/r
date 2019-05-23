@@ -1,4 +1,4 @@
-use crate::node::*;
+use crate::components::Node;
 use amethyst::core::Transform;
 use amethyst::ecs::{Join, Read, ReadStorage, System, WriteStorage};
 use amethyst::input::InputHandler;

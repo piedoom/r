@@ -1,0 +1,51 @@
+#![enable(implicit_some)]
+
+// Creates catchers for the game    
+Prefab(
+    entities: [
+        PrefabEntity(
+            data: Catcher(
+                direction: Left,
+                graphics: (
+                    mesh: Shape((shape: Plane(None),)),
+                    material: (
+                        albedo: File("assets/arrows_line.png", Png, (channel: Srgb),),
+                    ),
+                ),
+            ),
+        ),
+        PrefabEntity(
+            data: Catcher(
+                direction: Up,
+                graphics: (
+                    mesh: Shape((shape: Plane(None),)),
+                    material: (
+                        albedo: File("assets/arrows_line.png", Png, (channel: Srgb),),
+                    ),
+                ),
+            ),
+        ),
+        PrefabEntity(
+            data: Catcher(
+                direction: Down,
+                graphics: (
+                    mesh: Shape((shape: Plane(None),)),
+                    material: (
+                        albedo: File("assets/arrows_line.png", Png, (channel: Srgb),),
+                    ),
+                ),
+            ),
+        ),
+        PrefabEntity(
+            data: Catcher(
+                direction: Right,
+                graphics: (
+                    mesh: Shape((shape: Plane(None),)),
+                    material: (
+                        albedo: File("assets/arrows_line.png", Png, (channel: Srgb),),
+                    ),
+                ),
+            ),
+        ),
+    ],
+)

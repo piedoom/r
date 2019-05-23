@@ -1,14 +1,21 @@
-use crate::node::*;
-use amethyst::assets::{AssetStorage, Loader, Handle};
-use amethyst::ecs::prelude::{Component, DenseVecStorage};
+use crate::components::*;
+use crate::util::Direction;
+use amethyst::assets::{AssetStorage, Loader, Handle, Prefab, PrefabLoader, RonFormat, PrefabData};
+use amethyst::ecs::prelude::{Component, DenseVecStorage, SystemData};
 use amethyst::prelude::*;
-use amethyst::renderer::{
-    Camera, Flipped, PngFormat, Projection, SpriteRender, SpriteSheet, SpriteSheetFormat,
-    SpriteSheetHandle, Texture, TextureMetadata,
+use amethyst::{
+    renderer::{
+        camera::{Camera, Projection},
+        formats::texture::ImageFormat,
+        sprite::{SpriteRender, SpriteSheet, SpriteSheetFormat, SpriteSheetHandle},
+        Texture,
+    },
 };
 use amethyst::core::math::Vector3;
 use amethyst::core::Transform;
-use crate::systems::Catcher;
+use amethyst::core::transform::Parent;
+use serde::{Serialize, Deserialize};
+use crate::systems::CatcherSystem;
 
 pub struct Sprites {
     pub arrows: SpriteSheetHandle,
@@ -45,39 +52,47 @@ impl SimpleState for Game {
 }
 
 impl Game {
-    pub fn load_sprite_sheet(world: &mut World, path: &str) -> SpriteSheetHandle {
-        // Load the sprite sheet necessary to render the graphics.
-        // The texture is the pixel data
-        // `texture_handle` is a cloneable reference to the texture
+    fn load_sprite_sheet(world: &mut World, path: &str) -> SpriteSheetHandle {
         let texture_handle = {
             let loader = world.read_resource::<Loader>();
             let texture_storage = world.read_resource::<AssetStorage<Texture>>();
             loader.load(
                 path,
-                PngFormat,
-                TextureMetadata::srgb_scale(),
+                ImageFormat::default(),
                 (),
                 &texture_storage,
             )
         };
-
         let loader = world.read_resource::<Loader>();
         let sprite_sheet_store = world.read_resource::<AssetStorage<SpriteSheet>>();
         loader.load(
-            format!("{}.{}", path, "ron"), // Here we load the associated ron file
-            SpriteSheetFormat,
-            texture_handle, // We pass it the handle of the texture we want it to use
+            format!("{}.{}", path, "ron"),
+            SpriteSheetFormat(texture_handle),
             (),
             &sprite_sheet_store,
         )
     }
 
     fn initialize_game(world: &mut World) {
-        // setup catcher arrows
+        let catchers = world.create_entity().with(Transform::default()).build();
 
-        // get sprite sheet 
-        // TODO: use resource
+        let columns = [Direction::Left, Direction::Up, Direction::Down, Direction::Right];
+        for column in columns.iter() {
+            world.create_entity()
+                .with(Parent::new(catchers))
+                .with(Catcher{direction: column.clone()})
+                .build();
+        }
+
+        // attach our prefab to our parent entity
+        /* world.create_entity()
+            .with(catchers_prefab_handle.clone())
+            .with(Parent::new(catchers))
+            .build();
+        
+        */
         let sprites = Self::load_sprite_sheet(world, "textures/arrows_line.png");
+
 
         // loop to create all arrows
         for i in 0..4 {
@@ -90,7 +105,7 @@ impl Game {
                 .with(
                     Transform::from(Vector3::new(16.0f64 + (i as f64 * 16.0),50.0,0.0))
                 )
-                .with(Catcher{direction: NodeDirection::from(i)})
+                .with(Catcher{direction: Direction::from(i)})
                 .with(sprite_render)
                 .build();
         }
@@ -100,7 +115,7 @@ impl Game {
         world
             .create_entity()
             .with(Camera::from(Projection::orthographic(
-                0.0, 100.0, 0.0, 100.0,
+                0.0, 100.0, 0.0, 100.0, 0.1, 2000.0,
             )))
             .with(Transform::from(Vector3::new(0.0,0.0,1.0)))
             .build();
